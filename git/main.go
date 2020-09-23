@@ -72,7 +72,7 @@ func (r *Repo) Branch() string {
 
 func (r *Repo) URL(file string) (string, error) {
 
-	res, err := gitlab.File(gitlab.Remote{r.Remote}, r.Dir, r.Branch(), file)
+	res, err := gitlab.File(gitlab.Remote{R: r.Remote}, r.Dir, r.Branch(), file)
 	if err == nil {
 		return res, nil
 	}
