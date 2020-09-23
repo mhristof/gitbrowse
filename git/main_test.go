@@ -91,3 +91,41 @@ func TestURL(t *testing.T) {
 		assert.Equal(t, test.expected, url, test.name)
 	}
 }
+
+func TestFindGitFolder(t *testing.T) {
+	var cases = []struct {
+		name string
+		dir  string
+		file string
+		err  error
+	}{
+		{
+			name: "file in root",
+			dir:  newRepo("", "master"),
+			file: "foo",
+			err:  nil,
+		},
+		{
+			name: "file in folder",
+			dir:  newRepo("", "master"),
+			file: "foo/bar",
+			err:  nil,
+		},
+		{
+			name: "file not in repo",
+			dir:  "/tmp",
+			file: "/tmp/foobar",
+			err:  ErrorNotAGitRepo,
+		},
+	}
+
+	for _, test := range cases {
+		abs, err := filepath.Abs(test.file)
+		path, err := findGitFolder(filepath.Join(test.dir, abs))
+
+		assert.Equal(t, test.err, err, test.name)
+		if test.err == nil {
+			assert.Equal(t, test.dir, path, test.name)
+		}
+	}
+}

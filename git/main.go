@@ -2,6 +2,7 @@ package git
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,17 +20,22 @@ type Repo struct {
 	Dir    string
 }
 
+var (
+	ErrorNotAGitRepo = errors.New("not a git repository")
+)
+
 func findGitFolder(path string) (string, error) {
 	parts := strings.Split(path, "/")
 	for i := len(parts) - 1; i > 0; i-- {
 		thisPath := "/" + filepath.Join(parts[0:i]...)
 		thisPathGit := filepath.Join(thisPath, ".git")
+		fmt.Println(thisPathGit)
 		if info, err := os.Stat(thisPathGit); err == nil && info.IsDir() {
 			return thisPath, nil
 		}
 	}
 
-	return "", errors.New("Could not find .git folder")
+	return "", ErrorNotAGitRepo
 }
 
 func New(directory string) (*Repo, error) {
