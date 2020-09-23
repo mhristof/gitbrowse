@@ -72,7 +72,13 @@ func (r *Repo) Branch() string {
 
 func (r *Repo) URL(file string) (string, error) {
 
-	res, err := gitlab.File(gitlab.Remote{R: r.Remote}, r.Dir, r.Branch(), file)
+	absFile, err := filepath.Abs(file)
+	if err != nil {
+		panic(err)
+	}
+
+	relativeFile := strings.TrimPrefix(strings.Replace(absFile, r.Dir, "", -1), "/")
+	res, err := gitlab.File(gitlab.Remote{R: r.Remote}, r.Branch(), relativeFile)
 	if err == nil {
 		return res, nil
 	}
