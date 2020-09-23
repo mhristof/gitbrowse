@@ -37,13 +37,21 @@ func findGitFolder(path string) (string, error) {
 func New(directory string) (*Repo, error) {
 	absDir, err := filepath.Abs(directory)
 	if err != nil {
-		panic(err)
+		log.WithFields(log.Fields{
+			"err":       err,
+			"directory": directory,
+		}).Panic("Cannot calculate abs path")
+
 	}
 
 	if info, err := os.Stat(absDir); err != nil || !info.IsDir() {
 		absDir, err = findGitFolder(absDir)
 		if err != nil {
-			panic(err)
+			log.WithFields(log.Fields{
+				"err":    err,
+				"absDir": absDir,
+			}).Panic("Cannot find .git folder")
+
 		}
 	}
 
@@ -65,7 +73,11 @@ func New(directory string) (*Repo, error) {
 func (r *Repo) Branch() string {
 	head, err := ioutil.ReadFile(filepath.Join(r.Dir, ".git/HEAD"))
 	if err != nil {
-		panic(err)
+		log.WithFields(log.Fields{
+			"err":   err,
+			"r.Dir": r.Dir,
+		}).Panic("Cannot find .git/HEAD")
+
 	}
 
 	headS := strings.Split(strings.Split(string(head), "\n")[0], " ")[1]
@@ -75,7 +87,11 @@ func (r *Repo) Branch() string {
 func (r *Repo) URL(file string) (string, error) {
 	absFile, err := filepath.Abs(file)
 	if err != nil {
-		panic(err)
+		log.WithFields(log.Fields{
+			"err":  err,
+			"file": file,
+		}).Panic("Cannot calculate abs path")
+
 	}
 
 	relativeFile := strings.TrimPrefix(strings.Replace(absFile, r.Dir, "", -1), "/")

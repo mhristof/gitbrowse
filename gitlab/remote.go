@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/mhristof/germ/log"
 )
 
 type Remote struct {
@@ -43,7 +45,11 @@ func (r *Remote) URL() string {
 
 		}
 	}
-	panic("Not a gitlab remote")
+	log.WithFields(log.Fields{
+		"r.R": r.R,
+	}).Error("Not a gitlab remote")
+
+	return ""
 }
 
 func (r *Remote) File(branch, file string) (string, error) {

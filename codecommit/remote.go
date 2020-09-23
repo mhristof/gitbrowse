@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/mhristof/germ/log"
 )
 
 type Remote struct {
@@ -34,7 +36,10 @@ func (r *Remote) Valid() bool {
 func (r *Remote) Region() string {
 	parts, err := url.Parse(r.R)
 	if err != nil {
-		panic(err)
+		log.WithFields(log.Fields{
+			"r.R": r.R,
+		}).Error("Cannot extract region")
+
 	}
 
 	return strings.Split(parts.Host, ".")[1]
@@ -53,11 +58,16 @@ func (r *Remote) URL() string {
 	}
 
 	if region, _ := info["region"]; region == "" {
-		panic("Not a codecommit remote - missing region")
+		log.WithFields(log.Fields{
+			"r.R": r.R,
+		}).Error("Cannot find region")
 	}
 
 	if repo, _ := info["repo"]; repo == "" {
-		panic("Not a codecommit remote - missing repo")
+		log.WithFields(log.Fields{
+			"r.R": r.R,
+		}).Error("Cannot retrieve repo")
+
 	}
 
 	return fmt.Sprintf("https://%s.console.aws.amazon.com/codesuite/codecommit/repositories/%s", info["region"], info["repo"])

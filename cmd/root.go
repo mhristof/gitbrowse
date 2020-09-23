@@ -33,7 +33,10 @@ var rootCmd = &cobra.Command{
 
 		url, err := repo.URL(args[0])
 		if err != nil {
-			panic(err)
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("Cannot calculate url")
+
 		}
 		fmt.Println(url)
 

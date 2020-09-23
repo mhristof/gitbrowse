@@ -3,14 +3,26 @@ package git
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
 
+	"github.com/mhristof/gitbrowse/log"
 	"github.com/stretchr/testify/assert"
 )
+
+func eval(args []string) {
+	cmd := exec.Command(args[0], args[1:]...)
+	err := cmd.Run()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err":  err,
+			"args": args,
+		}).Panic("Cannot execute command")
+
+	}
+}
 
 func newRepo(remote, branch string) string {
 	dir, err := ioutil.TempDir("", "")
@@ -18,23 +30,11 @@ func newRepo(remote, branch string) string {
 		log.Fatal(err)
 	}
 
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && git init", dir))
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	eval([]string{"bash", "-c", fmt.Sprintf("cd %s && git init", dir)})
 
-	cmd = exec.Command("git", "-C", dir, "remote", "add", "origin", remote)
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	eval([]string{"git", "-C", dir, "remote", "add", "origin", remote})
 
-	cmd = exec.Command("git", "-C", dir, "checkout", "-b", branch)
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	eval([]string{"git", "-C", dir, "checkout", "-b", branch})
 
 	return dir
 }

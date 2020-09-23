@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/mhristof/gitbrowse/log"
 	"github.com/riywo/loginshell"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +24,10 @@ var completionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		shell, err := loginshell.Shell()
 		if err != nil {
-			panic(err)
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("Cannot retrieve login shell")
+
 		}
 
 		switch filepath.Base(shell) {

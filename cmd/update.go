@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/mhristof/gitbrowse/log"
 	"github.com/mhristof/go-update"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,10 @@ var (
 			url := fmt.Sprintf("https://github.com/mhristof/gitbrowse/releases/latest/download/gitbrowse.%s", runtime.GOOS)
 			updates, updateFunc, err := update.Check(url)
 			if err != nil {
-				panic(err)
+				log.WithFields(log.Fields{
+					"err": err,
+				}).Error("Cannot Check for an update")
+
 			}
 
 			if !updates {
