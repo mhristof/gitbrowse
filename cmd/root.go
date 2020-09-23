@@ -9,10 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version = "devel"
+
 var rootCmd = &cobra.Command{
-	Use:   "gitbrowse",
-	Short: "Translate local git repositories to URLs",
-	Args:  cobra.ExactArgs(1),
+	Use:     "gitbrowse",
+	Short:   "Translate local git repositories to URLs",
+	Args:    cobra.ExactArgs(1),
+	Version: version,
 	Run: func(cmd *cobra.Command, args []string) {
 		Verbose(cmd)
 
@@ -55,6 +58,7 @@ func Verbose(cmd *cobra.Command) {
 
 func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Increase verbosity")
+	rootCmd.PersistentFlags().BoolP("dryrun", "n", false, "Dry run")
 }
 
 // Execute The main function for the root command

@@ -28,7 +28,7 @@ var (
 			}
 
 			if silent, _ := cmd.Flags().GetBool("silent"); !silent {
-				fmt.Println("New version downloaded!")
+				fmt.Println("New version available!")
 			}
 
 			if dryrun, _ := cmd.Flags().GetBool("dryrun"); dryrun {
@@ -36,6 +36,7 @@ var (
 			}
 
 			updateFunc()
+			fmt.Println("Updated")
 		},
 	}
 )
