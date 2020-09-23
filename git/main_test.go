@@ -69,7 +69,6 @@ func TestURL(t *testing.T) {
 		defer os.RemoveAll(dir)
 
 		repo, err := New(dir)
-		fmt.Println(err)
 		assert.Nil(t, err, test.name)
 
 		url, err := repo.URL(filepath.Join(dir, test.file))

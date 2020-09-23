@@ -36,7 +36,6 @@ func (r *Remote) URL() string {
 	var remRegex = regexp.MustCompile(`https://(?P<username>.*):(?P<token>.*)@(?P<url>.*)`)
 	match := remRegex.FindStringSubmatch(r.R)
 
-	fmt.Println(r.R)
 	if remRegex.MatchString(r.R) {
 		for i, name := range remRegex.SubexpNames() {
 			if name == "url" {

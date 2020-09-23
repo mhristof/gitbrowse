@@ -29,8 +29,6 @@ var rootCmd = &cobra.Command{
 			}).Warning("Cant create a repo")
 		}
 
-		fmt.Println(fmt.Sprintf("repo: %+v", repo))
-
 		url, err := repo.URL(args[0])
 		if err != nil {
 			log.WithFields(log.Fields{

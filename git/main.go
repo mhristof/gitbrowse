@@ -2,7 +2,6 @@ package git
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,7 +24,6 @@ func findGitFolder(path string) (string, error) {
 	for i := len(parts) - 1; i > 0; i-- {
 		thisPath := "/" + filepath.Join(parts[0:i]...)
 		thisPathGit := filepath.Join(thisPath, ".git")
-		fmt.Println(thisPathGit)
 		if info, err := os.Stat(thisPathGit); err == nil && info.IsDir() {
 			return thisPath, nil
 		}
@@ -54,8 +52,6 @@ func New(directory string) (*Repo, error) {
 
 		}
 	}
-
-	fmt.Println(absDir)
 
 	cfg, err := ini.Load(filepath.Join(absDir, ".git/config"))
 	if err != nil {
