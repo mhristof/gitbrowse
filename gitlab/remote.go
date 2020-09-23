@@ -1,8 +1,10 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type Remote struct {
@@ -42,4 +44,13 @@ func (r *Remote) URL() string {
 		}
 	}
 	panic("Not a gitlab remote")
+}
+
+func (r *Remote) File(branch, file string) (string, error) {
+	if !r.isGitlab() {
+		return "", errors.New("cannot handle this remote")
+	}
+
+	branch = strings.Replace(branch, "refs/heads/origin/", "", -1)
+	return fmt.Sprintf("%s/-/blob/%s/%s", r.URL(), branch, file), nil
 }
