@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mhristof/gitbrowse/codecommit"
 	"github.com/mhristof/gitbrowse/gitlab"
 	"github.com/mhristof/gitbrowse/log"
 	"gopkg.in/ini.v1"
@@ -80,6 +81,12 @@ func (r *Repo) URL(file string) (string, error) {
 
 	gl := gitlab.Remote{R: r.Remote}
 	res, err := gl.File(r.Branch(), relativeFile)
+	if err == nil {
+		return res, nil
+	}
+
+	cc := codecommit.Remote{R: r.Remote}
+	res, err = cc.File(r.Branch(), relativeFile)
 	if err == nil {
 		return res, nil
 	}

@@ -20,7 +20,7 @@ func (r Remote) String() string {
 	return r.R
 }
 
-func (r *Remote) isGitlab() bool {
+func (r *Remote) Valid() bool {
 	var gitlabURL = regexp.MustCompile(`gitlab`)
 
 	if gitlabURL.MatchString(r.R) {
@@ -47,7 +47,7 @@ func (r *Remote) URL() string {
 }
 
 func (r *Remote) File(branch, file string) (string, error) {
-	if !r.isGitlab() {
+	if !r.Valid() {
 		return "", errors.New("cannot handle this remote")
 	}
 
