@@ -21,7 +21,7 @@ func New(in string) Remote {
 func (r *Remote) Valid() bool {
 	parts, err := url.Parse(r.R)
 	if err != nil {
-		panic(err)
+		return false
 	}
 
 	if strings.HasPrefix(parts.Host, "git-codecommit") && strings.HasSuffix(parts.Host, ".amazonaws.com") {

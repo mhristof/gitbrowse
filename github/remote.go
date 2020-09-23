@@ -3,6 +3,7 @@ package github
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -30,12 +31,24 @@ func (r *Remote) Valid() bool {
 	return false
 }
 
-func (r *Remote) URL() string {
-	var remRegex = regexp.MustCompile(`https://(?P<url>.*)`)
-	match := remRegex.FindStringSubmatch(r.R)
+func gitToHttp(remote string) string {
+	if !strings.HasPrefix(remote, "git@") {
+		return remote
+	}
 
-	fmt.Println(r.R)
-	if remRegex.MatchString(r.R) {
+	user := strings.Split(filepath.Dir(remote), ":")[1]
+	host := strings.Split(strings.Split(remote, ":")[0], "@")[1]
+	repo := filepath.Base(remote)
+
+	return fmt.Sprintf("https://%s/%s/%s", host, user, repo)
+}
+
+func (r *Remote) URL() string {
+	remote := gitToHttp(r.R)
+	var remRegex = regexp.MustCompile(`https://(?P<url>.*)`)
+	match := remRegex.FindStringSubmatch(remote)
+
+	if remRegex.MatchString(remote) {
 		for i, name := range remRegex.SubexpNames() {
 			if name == "url" {
 				return strings.Replace(fmt.Sprintf("https://%s", match[i]), ".git", "", -1)

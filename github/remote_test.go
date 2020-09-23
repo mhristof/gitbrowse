@@ -22,6 +22,11 @@ func TestURL(t *testing.T) {
 			remote: "https://github.com/user/repo",
 			exp:    "https://github.com/user/repo",
 		},
+		{
+			name:   "valid git remote",
+			remote: "git@github.com:user/repo.git",
+			exp:    "https://github.com/user/repo",
+		},
 	}
 
 	for _, test := range cases {
@@ -60,5 +65,29 @@ func TestFile(t *testing.T) {
 		url, err := r.File(test.branch, test.file)
 		assert.Nil(t, err, test.name)
 		assert.Equal(t, test.exp, url, test.name)
+	}
+}
+
+func TestGitToHttp(t *testing.T) {
+	var cases = []struct {
+		name   string
+		remote string
+		exp    string
+	}{
+		{
+			name:   "git remote",
+			remote: "git@github.com:mhristof/alfred-pbpaste.git",
+			exp:    "https://github.com/mhristof/alfred-pbpaste.git",
+		},
+		{
+			name:   "http remote (passthrough mode)",
+			remote: "https://github.com/mhristof/alfred-pbpaste.git",
+			exp:    "https://github.com/mhristof/alfred-pbpaste.git",
+		},
+	}
+
+	for _, test := range cases {
+		assert.Equal(t, test.exp, gitToHttp(test.remote), test.name)
+
 	}
 }
