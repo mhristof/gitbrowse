@@ -56,6 +56,6 @@ func (r *Remote) File(branch, file string) (string, error) {
 		return "", errors.New("cannot handle this remote")
 	}
 
-	branch = strings.Replace(branch, "refs/heads/origin/", "", -1)
+	branch = strings.Replace(branch, "refs/heads/", "", -1)
 	return fmt.Sprintf("%s/-/blob/%s/%s", r.URL(), branch, file), nil
 }
