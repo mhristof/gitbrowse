@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
-	"github.com/mhristof/germ/log"
+	"github.com/mhristof/gitbrowse/gitlab"
+	"github.com/mhristof/gitbrowse/log"
 	"gopkg.in/ini.v1"
 )
 
@@ -72,55 +72,10 @@ func (r *Repo) Branch() string {
 
 func (r *Repo) URL(file string) (string, error) {
 
-	res, err := r.gitlab(file)
+	res, err := gitlab.File(gitlab.Remote{r.Remote}, r.Dir, r.Branch(), file)
 	if err == nil {
 		return res, nil
 	}
 
 	return "", errors.New("Cannot handle remote type")
-}
-
-func (r *Repo) gitlab(file string) (string, error) {
-	if !isGitlab(r.Remote) {
-		return "", errors.New("Not a gitlab remote")
-	}
-
-	absFile, err := filepath.Abs(file)
-	if err != nil {
-		panic(err)
-	}
-
-	relativeFile := strings.TrimPrefix(strings.Replace(absFile, r.Dir, "", -1), "/")
-	fmt.Println("relative file", relativeFile)
-	remote := gitlabRemoteToURL(r.Remote)
-
-	branch := strings.Replace(r.Branch(), "refs/heads/origin/", "", -1)
-	return fmt.Sprintf("%s/-/blob/%s/%s", remote, branch, relativeFile), nil
-}
-
-func gitlabRemoteToURL(remote string) string {
-	var remRegex = regexp.MustCompile(`https://(?P<username>.*):(?P<token>.*)@(?P<url>.*)`)
-	match := remRegex.FindStringSubmatch(remote)
-
-	if remRegex.MatchString(remote) {
-		for i, name := range remRegex.SubexpNames() {
-			if name == "url" {
-				return fmt.Sprintf("https://%s", match[i])
-			}
-
-		}
-	}
-
-	panic("panic!")
-
-}
-
-func isGitlab(remote string) bool {
-	var gitlabURL = regexp.MustCompile(`gitlab`)
-
-	if gitlabURL.MatchString(remote) {
-		return true
-	}
-
-	return false
 }
