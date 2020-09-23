@@ -68,8 +68,6 @@ func (r *Remote) File(branch, file string) (string, error) {
 		return "", errors.New("cannot handle this remote")
 	}
 
-	//fmt.Println(fmt.Sprintf("branch: %+v", branch))
-
 	branch = strings.Replace(branch, "refs/heads/", "", -1)
 	return fmt.Sprintf("%s/browse/refs/heads/%s/--/%s?region=%s", r.URL(), branch, file, r.Region()), nil
 }
