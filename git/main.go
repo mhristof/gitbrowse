@@ -92,7 +92,7 @@ func (r *Repo) Branch() string {
 
 // URL Returns the web url for the given file. Currently gitlab, github and codecommit
 // are supported
-func (r *Repo) URL(file string) (string, error) {
+func (r *Repo) URL(file string, line int) (string, error) {
 	absFile, err := filepath.Abs(file)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -105,19 +105,19 @@ func (r *Repo) URL(file string) (string, error) {
 	relativeFile := strings.TrimPrefix(strings.Replace(absFile, r.Dir, "", -1), "/")
 
 	gl := gitlab.Remote{R: r.Remote}
-	res, err := gl.File(r.Branch(), relativeFile)
+	res, err := gl.File(r.Branch(), relativeFile, line)
 	if err == nil {
 		return res, nil
 	}
 
 	cc := codecommit.Remote{R: r.Remote}
-	res, err = cc.File(r.Branch(), relativeFile)
+	res, err = cc.File(r.Branch(), relativeFile, line)
 	if err == nil {
 		return res, nil
 	}
 
 	gh := github.Remote{R: r.Remote}
-	res, err = gh.File(r.Branch(), relativeFile)
+	res, err = gh.File(r.Branch(), relativeFile, line)
 	if err == nil {
 		return res, nil
 	}

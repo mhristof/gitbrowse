@@ -77,11 +77,17 @@ func (r *Remote) URL() string {
 }
 
 // File Retrieves the URL for the given file/branch combination
-func (r *Remote) File(branch, file string) (string, error) {
+func (r *Remote) File(branch, file string, line int) (string, error) {
 	if !r.Valid() {
 		return "", ErrorNotCodeCommit
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)
-	return fmt.Sprintf("%s/browse/refs/heads/%s/--/%s?region=%s", r.URL(), branch, file, r.Region()), nil
+	ret := fmt.Sprintf("%s/browse/refs/heads/%s/--/%s?region=%s", r.URL(), branch, file, r.Region())
+
+	if line >= 0 {
+		ret += fmt.Sprintf("#L%d-%d", line, line)
+	}
+
+	return ret, nil
 }

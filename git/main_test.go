@@ -53,28 +53,28 @@ func TestURL(t *testing.T) {
 			remote:   "https://glUsernames:glToken@gitlab.com/project/repository",
 			branch:   "master",
 			file:     "README.md",
-			expected: "https://gitlab.com/project/repository/-/blob/master/README.md",
+			expected: "https://gitlab.com/project/repository/-/blob/master/README.md#L0",
 		},
 		{
 			name:     "gitlab https remote with username and token on a branch",
 			remote:   "https://glUsernames:glToken@gitlab.com/project/repository",
 			branch:   "branch",
 			file:     "README.md",
-			expected: "https://gitlab.com/project/repository/-/blob/branch/README.md",
+			expected: "https://gitlab.com/project/repository/-/blob/branch/README.md#L0",
 		},
 		{
 			name:     "github remote",
 			remote:   "https://github.com/user/repo.git",
 			branch:   "branch",
 			file:     "README.md",
-			expected: "https://github.com/user/repo/blob/branch/README.md",
+			expected: "https://github.com/user/repo/blob/branch/README.md#L0",
 		},
 		{
 			name:     "codecommit repo",
 			remote:   "https://git-codecommit.region.amazonaws.com/v1/repos/foobar",
 			branch:   "branch",
 			file:     "test/readme.md",
-			expected: "https://region.console.aws.amazon.com/codesuite/codecommit/repositories/foobar/browse/refs/heads/branch/--/test/readme.md?region=region",
+			expected: "https://region.console.aws.amazon.com/codesuite/codecommit/repositories/foobar/browse/refs/heads/branch/--/test/readme.md?region=region#L0-0",
 		},
 	}
 
@@ -85,7 +85,7 @@ func TestURL(t *testing.T) {
 		repo, err := New(dir)
 		assert.Nil(t, err, test.name)
 
-		url, err := repo.URL(filepath.Join(dir, test.file))
+		url, err := repo.URL(filepath.Join(dir, test.file), 0)
 		assert.Nil(t, err, test.name)
 
 		assert.Equal(t, test.expected, url, test.name)

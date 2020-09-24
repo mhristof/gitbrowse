@@ -57,6 +57,7 @@ func TestFile(t *testing.T) {
 		remote string
 		branch string
 		file   string
+		line   int
 		exp    string
 	}{
 		{
@@ -64,14 +65,23 @@ func TestFile(t *testing.T) {
 			remote: "https://git-codecommit.eu-west-2.amazonaws.com/v1/repos/repo",
 			branch: "master",
 			file:   "test/readme.md",
+			line:   -1,
 			exp:    "https://eu-west-2.console.aws.amazon.com/codesuite/codecommit/repositories/repo/browse/refs/heads/master/--/test/readme.md?region=eu-west-2",
+		},
+		{
+			name:   "simple file",
+			remote: "https://git-codecommit.eu-west-2.amazonaws.com/v1/repos/repo",
+			branch: "master",
+			file:   "test/readme.md",
+			line:   100,
+			exp:    "https://eu-west-2.console.aws.amazon.com/codesuite/codecommit/repositories/repo/browse/refs/heads/master/--/test/readme.md?region=eu-west-2#L100-100",
 		},
 	}
 
 	for _, test := range cases {
 		r := Remote{R: test.remote}
 
-		url, err := r.File(test.branch, test.file)
+		url, err := r.File(test.branch, test.file, test.line)
 		assert.Nil(t, err, test.name)
 		assert.Equal(t, test.exp, url, test.name)
 	}

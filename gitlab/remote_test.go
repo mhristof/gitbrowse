@@ -31,6 +31,7 @@ func TestFile(t *testing.T) {
 		remote string
 		branch string
 		file   string
+		line   int
 		exp    string
 	}{
 		{
@@ -38,14 +39,23 @@ func TestFile(t *testing.T) {
 			remote: "https://user:token@gitlab.com/team/repo",
 			branch: "master",
 			file:   "test/readme.md",
+			line:   -1,
 			exp:    "https://gitlab.com/team/repo/-/blob/master/test/readme.md",
+		},
+		{
+			name:   "simple file with line",
+			remote: "https://user:token@gitlab.com/team/repo",
+			branch: "master",
+			file:   "test/readme.md",
+			line:   100,
+			exp:    "https://gitlab.com/team/repo/-/blob/master/test/readme.md#L100",
 		},
 	}
 
 	for _, test := range cases {
 		r := Remote{R: test.remote}
 
-		url, err := r.File(test.branch, test.file)
+		url, err := r.File(test.branch, test.file, test.line)
 		assert.Nil(t, err, test.name)
 		assert.Equal(t, test.exp, url, test.name)
 	}

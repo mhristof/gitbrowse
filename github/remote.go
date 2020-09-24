@@ -66,11 +66,15 @@ func (r *Remote) URL() string {
 }
 
 // File Retrieve the URL for the given file/branch combination
-func (r *Remote) File(branch, file string) (string, error) {
+func (r *Remote) File(branch, file string, line int) (string, error) {
 	if !r.Valid() {
 		return "", ErrorNotGithub
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)
-	return fmt.Sprintf("%s/blob/%s/%s", r.URL(), branch, file), nil
+	ret := fmt.Sprintf("%s/blob/%s/%s", r.URL(), branch, file)
+	if line >= 0 {
+		ret += fmt.Sprintf("#L%d", line)
+	}
+	return ret, nil
 }

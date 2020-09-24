@@ -32,7 +32,15 @@ var rootCmd = &cobra.Command{
 			}).Warning("Cant create a repo")
 		}
 
-		url, err := repo.URL(args[0])
+		line, err := cmd.Flags().GetInt("line")
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("Cannot retrieve line arg")
+
+		}
+
+		url, err := repo.URL(args[0], line)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": err,
@@ -59,6 +67,7 @@ func Verbose(cmd *cobra.Command) {
 func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Increase verbosity")
 	rootCmd.PersistentFlags().BoolP("dryrun", "n", false, "Dry run")
+	rootCmd.Flags().IntP("line", "l", -1, "Line number")
 }
 
 // Execute The main function for the root command
