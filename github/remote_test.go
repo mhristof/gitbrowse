@@ -68,7 +68,7 @@ func TestFile(t *testing.T) {
 	}
 }
 
-func TestGitToHttp(t *testing.T) {
+func TestGitToHTTP(t *testing.T) {
 	var cases = []struct {
 		name   string
 		remote string
@@ -87,7 +87,7 @@ func TestGitToHttp(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		assert.Equal(t, test.exp, gitToHttp(test.remote), test.name)
+		assert.Equal(t, test.exp, gitToHTTP(test.remote), test.name)
 
 	}
 }

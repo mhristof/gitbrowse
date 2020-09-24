@@ -15,12 +15,14 @@ import (
 	"gopkg.in/ini.v1"
 )
 
+// Repo holds information about a repository
 type Repo struct {
 	Remote string
 	Dir    string
 }
 
 var (
+	// ErrorNotAGitRepo is thrown when the given folder/config is not a git repository
 	ErrorNotAGitRepo = errors.New("not a git repository")
 )
 
@@ -38,6 +40,9 @@ func findGitFolder(path string) (string, error) {
 	return "", ErrorNotAGitRepo
 }
 
+// New Create a new git repository object from the given directory.
+// The directory could be relative or absolute folder or file inside the git
+// repository
 func New(directory string) (*Repo, error) {
 	absDir, err := filepath.Abs(directory)
 	if err != nil {
@@ -72,6 +77,7 @@ func New(directory string) (*Repo, error) {
 	}, nil
 }
 
+// Branch Return the current branch of the git repository by reading .git/HEAD
 func (r *Repo) Branch() string {
 	head, err := ioutil.ReadFile(filepath.Join(r.Dir, ".git/HEAD"))
 	if err != nil {
@@ -86,6 +92,8 @@ func (r *Repo) Branch() string {
 	return headS
 }
 
+// URL Returns the web url for the given file. Currently gitlab, github and codecommit
+// are supported
 func (r *Repo) URL(file string) (string, error) {
 	absFile, err := filepath.Abs(file)
 	if err != nil {

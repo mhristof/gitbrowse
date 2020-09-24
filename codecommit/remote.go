@@ -10,16 +10,17 @@ import (
 	"github.com/mhristof/germ/log"
 )
 
+var (
+	// ErrorNotCodeCommit Error returned when the remote is not a codecommit remote
+	ErrorNotCodeCommit = errors.New("not a codecommit remote")
+)
+
+// Remote Holds remote information
 type Remote struct {
 	R string
 }
 
-func New(in string) Remote {
-	return Remote{
-		R: in,
-	}
-}
-
+// Valid Checks if the remote is avalid codecommit remote
 func (r *Remote) Valid() bool {
 	parts, err := url.Parse(r.R)
 	if err != nil {
@@ -33,6 +34,7 @@ func (r *Remote) Valid() bool {
 	return false
 }
 
+// Region Retrieves the region of the remote
 func (r *Remote) Region() string {
 	parts, err := url.Parse(r.R)
 	if err != nil {
@@ -45,6 +47,7 @@ func (r *Remote) Region() string {
 	return strings.Split(parts.Host, ".")[1]
 }
 
+// URL Sanitise the remote to a valid url
 func (r *Remote) URL() string {
 	var remRegex = regexp.MustCompile(`https://git-codecommit.(?P<region>.*).amazonaws.com/v1/repos/(?P<repo>.*)`)
 	match := remRegex.FindStringSubmatch(r.R)
@@ -73,9 +76,10 @@ func (r *Remote) URL() string {
 	return fmt.Sprintf("https://%s.console.aws.amazon.com/codesuite/codecommit/repositories/%s", info["region"], info["repo"])
 }
 
+// File Retrieves the URL for the given file/branch combination
 func (r *Remote) File(branch, file string) (string, error) {
 	if !r.Valid() {
-		return "", errors.New("cannot handle this remote")
+		return "", ErrorNotCodeCommit
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)

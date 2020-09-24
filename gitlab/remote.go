@@ -9,19 +9,17 @@ import (
 	"github.com/mhristof/germ/log"
 )
 
+var (
+	// ErrorNotGitlab The remote doesnt seem like a Gitlab server
+	ErrorNotGitlab = errors.New("Not a valid Gitlab remote")
+)
+
+// Remote Represent a gitlab remote
 type Remote struct {
 	R string
 }
 
-func New(in string) Remote {
-	return Remote{
-		R: in,
-	}
-}
-func (r Remote) String() string {
-	return r.R
-}
-
+// Valid Checks a remote to see if its a valid gitlab instance
 func (r *Remote) Valid() bool {
 	var gitlabURL = regexp.MustCompile(`gitlab`)
 
@@ -32,6 +30,7 @@ func (r *Remote) Valid() bool {
 	return false
 }
 
+// URL Return the URL of the remote by sanitizing it
 func (r *Remote) URL() string {
 	var remRegex = regexp.MustCompile(`https://(?P<username>.*):(?P<token>.*)@(?P<url>.*)`)
 	match := remRegex.FindStringSubmatch(r.R)
@@ -51,9 +50,11 @@ func (r *Remote) URL() string {
 	return ""
 }
 
+// File Retrieves the file url for the given file. Throws a ErrorNotGitlab
+// if the repository is not a valid gitlab url
 func (r *Remote) File(branch, file string) (string, error) {
 	if !r.Valid() {
-		return "", errors.New("cannot handle this remote")
+		return "", ErrorNotGitlab
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)

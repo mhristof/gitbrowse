@@ -10,19 +10,17 @@ import (
 	"github.com/mhristof/germ/log"
 )
 
+var (
+	// ErrorNotGithub Error thrown when the remote doesnt seem like a valid github remote
+	ErrorNotGithub = errors.New("Not a valid github remote")
+)
+
+// Remote Holds remote information
 type Remote struct {
 	R string
 }
 
-func New(in string) Remote {
-	return Remote{
-		R: in,
-	}
-}
-func (r Remote) String() string {
-	return r.R
-}
-
+// Valid Checks if the remote is a valid Github repo
 func (r *Remote) Valid() bool {
 	var url = regexp.MustCompile(`github`)
 
@@ -33,7 +31,7 @@ func (r *Remote) Valid() bool {
 	return false
 }
 
-func gitToHttp(remote string) string {
+func gitToHTTP(remote string) string {
 	if !strings.HasPrefix(remote, "git@") {
 		return remote
 	}
@@ -45,8 +43,9 @@ func gitToHttp(remote string) string {
 	return fmt.Sprintf("https://%s/%s/%s", host, user, repo)
 }
 
+// URL Sanitises the remote to a valid url
 func (r *Remote) URL() string {
-	remote := gitToHttp(r.R)
+	remote := gitToHTTP(r.R)
 	var remRegex = regexp.MustCompile(`https://(?P<url>.*)`)
 	match := remRegex.FindStringSubmatch(remote)
 
@@ -66,9 +65,10 @@ func (r *Remote) URL() string {
 	return ""
 }
 
+// File Retrieve the URL for the given file/branch combination
 func (r *Remote) File(branch, file string) (string, error) {
 	if !r.Valid() {
-		return "", errors.New("cannot handle this remote")
+		return "", ErrorNotGithub
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)
