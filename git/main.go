@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/mhristof/gitbrowse/codecommit"
 	"github.com/mhristof/gitbrowse/github"
@@ -78,6 +79,10 @@ func (r *Repo) Branch() string {
 	return headS
 }
 
+type Remote interface {
+	File(string, string, int) (string, error)
+}
+
 // URL Returns the web url for the given file. Currently gitlab, github and codecommit
 // are supported
 func (r *Repo) URL(file string, line int) (string, error) {
@@ -92,23 +97,30 @@ func (r *Repo) URL(file string, line int) (string, error) {
 
 	relativeFile := strings.TrimPrefix(strings.Replace(absFile, r.Dir, "", -1), "/")
 
-	gl := gitlab.Remote{R: r.Remote}
-	res, err := gl.File(r.Branch(), relativeFile, line)
-	if err == nil {
-		return res, nil
+	remotes := []Remote{
+		&gitlab.Remote{R: r.Remote},
+		&codecommit.Remote{R: r.Remote},
+		&github.Remote{R: r.Remote},
 	}
 
-	cc := codecommit.Remote{R: r.Remote}
-	res, err = cc.File(r.Branch(), relativeFile, line)
-	if err == nil {
-		return res, nil
-	}
+	var wg sync.WaitGroup
+	wg.Add(len(remotes))
+	res := make(chan string, 1)
 
-	gh := github.Remote{R: r.Remote}
-	res, err = gh.File(r.Branch(), relativeFile, line)
-	if err == nil {
-		return res, nil
+	for _, remote := range remotes {
+		go url(&wg, r, remote, relativeFile, line, res)
 	}
+	wg.Wait()
 
-	return "", errors.New("Cannot handle remote type")
+	return <-res, nil
+}
+
+func url(wg *sync.WaitGroup, r *Repo, remote Remote, relativeFile string, line int, c chan string) {
+	defer wg.Done()
+
+	this, err := remote.File(r.Branch(), relativeFile, line)
+	if err != nil {
+		return
+	}
+	c <- this
 }
