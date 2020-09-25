@@ -27,7 +27,7 @@ var (
 
 func findGitFolder(path string) (string, error) {
 	parts := strings.Split(path, "/")
-	for i := len(parts) - 1; i > 0; i-- {
+	for i := len(parts); i > 0; i-- {
 		thisPath := "/" + filepath.Join(parts[0:i]...)
 		thisPathGit := filepath.Join(thisPath, ".git")
 		if info, err := os.Stat(thisPathGit); err == nil && info.IsDir() {
@@ -49,7 +49,7 @@ func New(directory string) (*Repo, error) {
 
 	absDir, err = findGitFolder(absDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "Canot find .git folder")
+		return nil, errors.Wrap(err, "Canot find .git folder in "+directory)
 	}
 
 	cfg, err := ini.Load(filepath.Join(absDir, ".git/config"))

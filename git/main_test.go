@@ -24,7 +24,7 @@ func eval(args []string) {
 	}
 }
 
-func newRepo(remote, branch string) string {
+func newRepo(remote, branch, file string) string {
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		log.Fatal(err)
@@ -35,6 +35,8 @@ func newRepo(remote, branch string) string {
 	eval([]string{"git", "-C", dir, "remote", "add", "origin", remote})
 
 	eval([]string{"git", "-C", dir, "checkout", "-b", branch})
+	eval([]string{"mkdir", "-p", filepath.Join(dir, filepath.Dir(file))})
+	eval([]string{"touch", filepath.Join(dir, file)})
 
 	return dir
 }
@@ -79,10 +81,11 @@ func TestURL(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		dir := newRepo(test.remote, test.branch)
+		dir := newRepo(test.remote, test.branch, test.file)
 		defer os.RemoveAll(dir)
 
 		repo, err := New(dir)
+
 		assert.Nil(t, err, test.name)
 
 		url, err := repo.URL(filepath.Join(dir, test.file), 0)
@@ -101,13 +104,13 @@ func TestFindGitFolder(t *testing.T) {
 	}{
 		{
 			name: "file in root",
-			dir:  newRepo("", "master"),
+			dir:  newRepo("", "master", "foo"),
 			file: "foo",
 			err:  nil,
 		},
 		{
 			name: "file in folder",
-			dir:  newRepo("", "master"),
+			dir:  newRepo("", "master", "foo/bar"),
 			file: "foo/bar",
 			err:  nil,
 		},
