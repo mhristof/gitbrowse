@@ -1,7 +1,6 @@
 package git
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"github.com/mhristof/gitbrowse/github"
 	"github.com/mhristof/gitbrowse/gitlab"
 	"github.com/mhristof/gitbrowse/log"
+	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
 )
 
@@ -44,29 +44,17 @@ func findGitFolder(path string) (string, error) {
 func New(directory string) (*Repo, error) {
 	absDir, err := filepath.Abs(directory)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"err":       err,
-			"directory": directory,
-		}).Panic("Cannot calculate abs path")
-
+		return nil, err
 	}
 
-	if info, err := os.Stat(absDir); err != nil || !info.IsDir() {
-		absDir, err = findGitFolder(absDir)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"err":    err,
-				"absDir": absDir,
-			}).Panic("Cannot find .git folder")
-
-		}
+	absDir, err = findGitFolder(absDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "Canot find .git folder")
 	}
 
 	cfg, err := ini.Load(filepath.Join(absDir, ".git/config"))
 	if err != nil {
-		log.WithFields(log.Fields{
-			"absDir": absDir,
-		}).Error("Cant read .git/config")
+		return nil, errors.Wrap(err, "Cant read .git/config")
 	}
 
 	return &Repo{

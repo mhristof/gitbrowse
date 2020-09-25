@@ -29,14 +29,14 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Warning("Cant create a repo")
+			}).Fatal("Cant create a repo")
 		}
 
 		line, err := cmd.Flags().GetInt("line")
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("Cannot retrieve line arg")
+			}).Panic("Cannot retrieve line arg")
 
 		}
 
@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("Cannot calculate url")
+			}).Fatal("Cannot calculate url")
 
 		}
 		fmt.Println(url)
@@ -55,6 +55,7 @@ var rootCmd = &cobra.Command{
 // Verbose Increase verbosity
 func Verbose(cmd *cobra.Command) {
 	verbose, err := cmd.Flags().GetBool("verbose")
+
 	if err != nil {
 		log.Panic(err)
 	}
