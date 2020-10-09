@@ -32,10 +32,39 @@ func (r *Remote) Valid() bool {
 
 // URL Return the URL of the remote by sanitizing it
 func (r *Remote) URL() string {
-	var remRegex = regexp.MustCompile(`https://(?P<username>.*):(?P<token>.*)@(?P<url>.*)`)
-	match := remRegex.FindStringSubmatch(r.R)
+	remote := gitlabHTTP(r.R)
+	if remote != "" {
+		return remote
+	}
 
-	if remRegex.MatchString(r.R) {
+	remote = gitlabSSH(r.R)
+	if remote != "" {
+		return remote
+	}
+
+	log.WithFields(log.Fields{
+		"r.R": r.R,
+	}).Error("Not a gitlab remote")
+
+	return ""
+
+}
+
+func gitlabSSH(url string) string {
+	if !strings.HasPrefix(url, "git@gitlab.com:") {
+		return ""
+	}
+
+	url = strings.TrimSuffix(url, ".git")
+
+	return strings.Replace(url, "git@gitlab.com:", "https://gitlab.com/", 1)
+}
+
+func gitlabHTTP(url string) string {
+	var remRegex = regexp.MustCompile(`https://(?P<username>.*):(?P<token>.*)@(?P<url>.*)`)
+	match := remRegex.FindStringSubmatch(url)
+
+	if remRegex.MatchString(url) {
 		for i, name := range remRegex.SubexpNames() {
 			if name == "url" {
 				return fmt.Sprintf("https://%s", match[i])
@@ -43,10 +72,6 @@ func (r *Remote) URL() string {
 
 		}
 	}
-	log.WithFields(log.Fields{
-		"r.R": r.R,
-	}).Error("Not a gitlab remote")
-
 	return ""
 }
 

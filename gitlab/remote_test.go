@@ -17,6 +17,11 @@ func TestURL(t *testing.T) {
 			remote: "https://username:token@gitlab.com/foo/bar",
 			exp:    "https://gitlab.com/foo/bar",
 		},
+		{
+			name:   "valid ssh remote",
+			remote: "git@gitlab.com:group/subgroup/repo.git",
+			exp:    "https://gitlab.com/group/subgroup/repo",
+		},
 	}
 
 	for _, test := range cases {
