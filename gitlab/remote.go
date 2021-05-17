@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mhristof/germ/log"
+	"github.com/mhristof/gitbrowse/log"
 )
 
 var (
