@@ -10,10 +10,8 @@ import (
 	"github.com/mhristof/gitbrowse/log"
 )
 
-var (
-	// ErrorNotGithub Error thrown when the remote doesnt seem like a valid github remote
-	ErrorNotGithub = errors.New("Not a valid github remote")
-)
+// ErrorNotGithub Error thrown when the remote doesnt seem like a valid github remote
+var ErrorNotGithub = errors.New("Not a valid github remote")
 
 // Remote Holds remote information
 type Remote struct {
@@ -22,7 +20,7 @@ type Remote struct {
 
 // Valid Checks if the remote is a valid Github repo
 func (r *Remote) Valid() bool {
-	var url = regexp.MustCompile(`github`)
+	url := regexp.MustCompile(`github`)
 
 	if url.MatchString(r.R) {
 		return true
@@ -46,7 +44,7 @@ func gitToHTTP(remote string) string {
 // URL Sanitises the remote to a valid url
 func (r *Remote) URL() string {
 	remote := gitToHTTP(r.R)
-	var remRegex = regexp.MustCompile(`https://(?P<url>.*)`)
+	remRegex := regexp.MustCompile(`https://(?P<url>.*)`)
 	match := remRegex.FindStringSubmatch(remote)
 
 	if remRegex.MatchString(remote) {
@@ -54,7 +52,6 @@ func (r *Remote) URL() string {
 			if name == "url" {
 				return strings.Replace(fmt.Sprintf("https://%s", match[i]), ".git", "", -1)
 			}
-
 		}
 	}
 
@@ -72,9 +69,16 @@ func (r *Remote) File(branch, file string, line int) (string, error) {
 	}
 
 	branch = strings.Replace(branch, "refs/heads/", "", -1)
-	ret := fmt.Sprintf("%s/blob/%s/%s", r.URL(), branch, file)
+	ret := fmt.Sprintf("%s/tree/%s/%s", r.URL(), branch, file)
 	if line >= 0 {
 		ret += fmt.Sprintf("#L%d", line)
 	}
+
+	log.WithFields(log.Fields{
+		"branch": branch,
+		"file":   file,
+		"line":   line,
+		"remote": r,
+	}).Debug("calculated url")
 	return ret, nil
 }

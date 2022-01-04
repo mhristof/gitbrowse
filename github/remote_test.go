@@ -7,7 +7,7 @@ import (
 )
 
 func TestURL(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		name   string
 		remote string
 		exp    string
@@ -36,7 +36,7 @@ func TestURL(t *testing.T) {
 }
 
 func TestFile(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		name   string
 		remote string
 		branch string
@@ -50,7 +50,7 @@ func TestFile(t *testing.T) {
 			branch: "master",
 			file:   "test/readme.md",
 			line:   -1,
-			exp:    "https://github.com/user/repo/blob/master/test/readme.md",
+			exp:    "https://github.com/user/repo/tree/master/test/readme.md",
 		},
 		{
 			name:   "simple file",
@@ -58,7 +58,7 @@ func TestFile(t *testing.T) {
 			branch: "foobar",
 			file:   "test/readme.md",
 			line:   -1,
-			exp:    "https://github.com/user/repo/blob/foobar/test/readme.md",
+			exp:    "https://github.com/user/repo/tree/foobar/test/readme.md",
 		},
 		{
 			name:   "simple file with line number",
@@ -66,7 +66,7 @@ func TestFile(t *testing.T) {
 			branch: "foobar",
 			file:   "test/readme.md",
 			line:   100,
-			exp:    "https://github.com/user/repo/blob/foobar/test/readme.md#L100",
+			exp:    "https://github.com/user/repo/tree/foobar/test/readme.md#L100",
 		},
 	}
 
@@ -80,7 +80,7 @@ func TestFile(t *testing.T) {
 }
 
 func TestGitToHTTP(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		name   string
 		remote string
 		exp    string
@@ -99,6 +99,5 @@ func TestGitToHTTP(t *testing.T) {
 
 	for _, test := range cases {
 		assert.Equal(t, test.exp, gitToHTTP(test.remote), test.name)
-
 	}
 }
